@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"google.golang.org/appengine"
+	"google.golang.org/appengine" // HL
+	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/user"
-	"google.golang.org/appengine/datastore"
 )
 
 type Greeting struct {
