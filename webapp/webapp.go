@@ -1,7 +1,6 @@
 package webapp
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 	"time"
@@ -75,7 +74,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	fmt.Fprintf(w, "Hello %v", u)
+	http.Redirect(w,r,"/", http.StatusFound)
 }
 
 const guestbookTemplateHTML = `
@@ -93,6 +92,7 @@ const guestbookTemplateHTML = `
       <div><textarea name="content" rows="3" cols="60"></textarea></div>
       <div><input type="submit" value="Sign Guestbook"></div>
     </form>
+    <a href="/login">Login to see your username</a>
   </body>
 </html>
 `
