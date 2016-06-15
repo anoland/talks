@@ -101,7 +101,7 @@ Also have a new name: Services
 
 Each has a different app.yaml organized by directory
 
-.image modules_hierarchy.svg
+.image https://cloud.google.com/appengine/docs/images/modules_hierarchy.svg
 
  $ appcfg update dispatch
 
