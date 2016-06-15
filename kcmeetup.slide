@@ -86,7 +86,7 @@ Managed GAE just got a new name: Flexible Env
 
 Everyday NoSQL, but there are subtle differences*
 
-No update on entity, gen or regen key, find existing then update in place and save
+No update on entity, gen or regen key, find existing, then update in place and save
 
 No references or FKs. Store key in the entity if you want to use it
 
@@ -101,7 +101,7 @@ Also have a new name: Services
 
 Each has a different app.yaml organized by directory
 
-.image https://cloud.google.com/appengine/docs/images/modules_hierarchy.svg
+.image modules_hierarchy.svg
 
  $ appcfg update dispatch
 
