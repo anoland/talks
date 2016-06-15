@@ -4,13 +4,175 @@ Tags: golang appengine
 
 Adrian Noland
 
-* copy notes here
+* A bit about me
+
+PHP dev and Linux guru
+
+Sysadmin in a previous life
+
+Found go shortly after 1.0
+
+IMHO what was missing from PHP5. PHP7 will be familiar
 
 * What are we doing
 
-* What is Appengine
- - Well, 
+What is needed to use go on GAE
 
+Some caveats
+
+Some interesting tidbits
+ 
+* What is Appengine
+
+Well...
+
+* Prereqs 
+- go installed
+- gcloud sdk
+.link https://cloud.google.com/sdk/docs/quickstart-linux#before-you-begin
+
+- gae sdk for go
+.link https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Go
+
+- set $PATH for gcloud commands
+
+*CAVEAT:* both sdk's have dev_appserver.py and other utils
+        need to use the correct one for the job
+        goapp is a basic wrapper around dev_appserver with defaults
+        gcloud is everything else: appengine, compute, container, repositories
+
+However, you have to use goapp to deploy
+
+* Gcloud commands
+
+ gcloud init
+
+ gcloud auth login
+
+-- login, needs browser
+
+ gcloud source repos clone default <directory> --project=anoland
+
+ gcloud source repos clone default anoland --project=anoland
+
+`.netrc` is your friend
+
+and 
+
+ git config --global url."https://".insteadOf git://
+
+* Overview of console
+
+Some important sections
+
+I use GAE, dev, datastore, logs
+
+Customizable button tray
+
+Can't use deployment manager (yet)
+
+* Console demo
+
+.link https://console.cloud.google.com/home/dashboard
+
+
+* Interesting things
+
+Everything mentioned is about "basic" GAE, not "managed" GAE
+
+Managed GAE just got a new name: Flexible Env
+
+* Datastore
+
+Everyday NoSQL, but there are subtle differences*
+
+No update on entity, gen or regen key, find existing then update in place and save
+
+No references or FKs. Store key in the entity if you want to use it
+
+There are parent/child relationships, again store the key.
+
+Rethink normalization process 
+
+Namespaces are neat
+  
+* Modules 
+Also have a new name: Services 
+
+Each has a different app.yaml organized by directory
+
+.image https://cloud.google.com/appengine/docs/images/modules_hierarchy.svg
+
+ $ appcfg update dispatch
+
+Use google SDK to figure out who to talk to
+
+* Background jobs
+
+- push queues
+- cron jobs
+- pull queues
+
+Have same priority and restrictions as main modules
+
+Can be shutdown without notice and must respond quickly
+
+True background jobs need compute or container engine
+
+Respond to `/_ah/<commands>`
+
+not the same as pub/sub api (double black belt)
+
+* Task queues (judo chop)
+
+push queues
+
+- easy api (green belt)
+- basically submit a post with a payload to a module url
+  
+cron jobs
+
+- midly complex( yellow belt)
+- basically a push queue on a schedule
+    
+pull queues
+
+- more complex (red belt)
+- REST API available to outside services
+- create a service account to hold credentials
+
+* Blobstore
+
+Dont use it
+
+Use storage API instead
+
+* Multiple versions of app
+
+You can save old instances and fall back in case of problems
+
+When you change the version number in app.yaml it happens automatically
+  
+* Logging
+
+stdlib log is useful because it is familiar
+
+appengine/log will output to console on dev and to logging api in production
+
+Has log levels (careful: quotas)
+
+Import both
+
+* Cloud shell
+
+Has potential
+
+Buuuuut not usable yet.
+
+Like other online shells/IDE, it is a different way of moving hands/fingers; I don't like it.
+
+"Free trial"?
+
+* Looky here
 .code webapp/webapp.go /^import/,/\)/
  
-* Thanks
