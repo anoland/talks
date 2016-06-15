@@ -109,9 +109,9 @@ Use google SDK to figure out who to talk to
 
 * Background jobs
 
-- push queues
-- cron jobs
-- pull queues
+- Push queues
+- Cron jobs
+- Pull queues
 
 Have same priority and restrictions as main modules
 
@@ -121,21 +121,22 @@ True background jobs need compute or container engine
 
 Respond to `/_ah/<commands>`
 
-not the same as pub/sub api (double black belt)
+Not the same as pub/sub api (double black belt)
 
 * Task queues (judo chop)
 
-push queues
+Push queues
 
 - easy api (green belt)
 - basically submit a post with a payload to a module url
   
-cron jobs
+Cron jobs
 
 - midly complex( yellow belt)
-- basically a push queue on a schedule
+- basically a push queue 
+- GAE will call module URL on schedule
     
-pull queues
+Pull queues
 
 - more complex (red belt)
 - REST API available to outside services
