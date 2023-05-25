@@ -1,0 +1,297 @@
+# HowTo BDD
+Tags: testing, presentation
+Summary: Brief overview of BDD with ginkgo
+Author: Adrian Noland
+
+## Objectives
+Share some insight about how to adopt BDD in general, Ginkgo specifically.
+
+Prompt some sidebar discussions about Testing vs. ${Something} Driven Design.
+
+Anything ${S}DD focuses on _correlating_ design of a system with _testing_ of the system.
+
+Designing testing into the system enforces designing testable code.
+
+Also discussed: test first, vs. test later.
+
+
+## Prior Art
+These search terms will give more insight about BDD structure and viewpoints:
+- jbehave
+- Cucumber
+- gerkin
+
+## BDD Testing is good. Why?
+Behaviour is based on requirements and requirements don’t change once the feature is released.
+
+- Corollary: new requirements incur new features (aka tests)
+
+## Kinds of testing
+\<airquote\>TDD\</airquote\> is based on state or process not based on classes, or functions.
+
+BDD requires a mental shift.
+
+Test Ideas, not Implementations.
+
+Not testing every step along the way, but the final outcome
+- demo example: amazon shipping a pillow
+
+.link https://coderstower.com/2019/09/24/unit-testing-behavior-vs-state/
+
+## BDD Golden Rules:
+One scenario, one behavior
+- Example: don’t do term search and image search in same scenario
+
+1. *Unique examples*
+
+2. Use good grammar
+
+3. Use 3rd person
+
+## Given - When - Then
+Examples in docs and/or blogs
+.link https://automationpanda.com/2017/01/30/bdd-101-writing-good-gherkin/
+.link https://techbeacon.com/app-dev-testing/better-behavior-driven-development-4-rules-writing-good-gherkin
+
+AKA: Arrange, Act, Assert
+.link https://java-design-patterns.com/patterns/arrange-act-assert/
+
+## Incorrect unique scenario 
+\# BAD EXAMPLE! Do not copy.
+
+Feature: Google Searching
+
+    Scenario: Google Image search shows pictures
+        Given: the user opens a web browser
+            And: the user navigates to "https://www.google.com/"
+            When: the user enters "panda" into the search bar
+            Then: links related to "panda" are shown on the results page
+            When: the user clicks on the "Images" link at the top of the results page
+            Then: images related to "panda" are shown on the results page
+
+* _there are no conditionals (AND, OR) when writing scenarios_
+
+## Correct unique scenario
+Feature: Google Searching
+
+    Scenario: Search from the search bar
+        Given: a web browser is at the Google home page
+            When: the user enters "panda" into the search bar
+            Then: links related to "panda" are shown on the results page
+    Scenario: Image search
+        Given: Google search results for "panda" are shown
+            When: the user clicks on the "Images" link at the top of the results page
+            Then: images related to "panda" are shown on the results page
+
+## Grammar counts 
+\# BAD EXAMPLE! Do not copy.
+
+Feature: Google Searching
+
+    Scenario: Google search result page elements
+        Given: the user navigates to the Google home page
+            When: the user entered "panda" at the search bar
+            Then: the results page shows links related to "panda"
+            And: image links for "panda"
+            And: video links for "panda"
+
+## Grammer counts
+Feature: Google Searching
+
+    Scenario: Simple Google search
+        Given: the Google home page is displayed
+            When: the user enters "panda" into the search bar
+            Then: links related to "panda" are shown on the results page
+
+## Uniqueness special case
+\# BAD EXAMPLE! Do not copy.
+Feature: SNES Mario Controls
+
+    Scenario: Mario jumps
+        Given: a level is started
+            When: the player pushes the "A" button
+            Or: the player pushes the "B" button
+            Then: Mario jumps straight up
+
+## Special case setup
+Feature: SNES Mario Controls
+
+    Scenario Outline: Mario jumps
+        Given a level is started
+        When the player pushes the "<letter>" button
+        Then Mario jumps straight up
+    
+    Examples: Buttons
+      | letter |
+      | A      |
+      | B      | 
+
+
+Clearly, the author’s intent is to say that Mario should jump when the player pushes either of two buttons. The author wants to cover multiple variations of the same behavior. In order to do this the right way, use "Scenario Outline sections" to cover multiple variations of the same behavior,...
+
+
+## What it looks like instead.
+.link https://semaphoreci.com/community/tutorials/getting-started-with-bdd-in-go-using-ginkgo#mapping-requirements-to-specifications
+
+
+## First off: Why even ginkgo?
+De Facto standard for testing kubernetes operators
+
+Used by k8s-sigs as well as operator-sdk && kubebuilder
+- see also: envtest
+
+## Detour: stdlib *testing.T
+Pros:
+- Nuts and bolts philosophy
+- "Just 'go' code" 
+- Readability is high
+
+Cons:
+- Test fixtures are DIY
+- Reporting is basic, and non-exportable to 3rd party systems. (w/o extra libs)*
+
+\* _Debatable_
+
+: TDD reduces the likelihood of having bugs in your tests. 
+: BDD: Bugs in tests are difficult to track when compared to TDD.
+
+## Ginkgo (and Gomega)
+
+Pros:
+- *Reporting built in*
+- BDD style*
+- Set up and tear down functions built in
+- Before*() and After*() funcs facilitates reuse
+- SuiteSetup() too
+- Compatible with 'go test'
+- Modularity
+  - Suite setup functions can create reusable mocks and state structures
+
+\* Subjective for sure.
+
+: it facilitates thinking about features and problems in the language of business rather than the language of code
+: it requires you to focus on data in your tests
+
+## Ginkgo (and Gomega)
+Cons: 
+- DSL readability
+- "Googleability"; hard to find full examples
+- "Heavy" libs
+- Upgrade V2 was a pain.
+
+## Confusion in Ginkgo
+Same word for multiple layers: Describe, Context, Specify/It
+
+It doesn't use same terminology as Given-When-Then
+
+Strange anonymous `func()` closures.
+
+.link https://utkarshmani1997.medium.com/unit-testing-with-ginkgo-part-3-9c1a4b892e01 UGH
+
+## The truth is the density of the expressions can be a hurdle.
+```
+ Describe("Extracting the author's first and last name", func() {
+    Context("When the author has both names", func() {
+      It("can extract the author's last name", func() {        
+        Expect(book.AuthorLastName()).To(Equal("Hugo"))
+      })
+      It("can extract the author's first name", func() {
+        Expect(book.AuthorFirstName()).To(Equal("Victor"))
+      })      
+    })
+    Context("When the author only has one name", func() {
+      BeforeEach(func() {
+        book.Author = "Hugo"
+      })  
+      It("interprets the single author name as a last name", func() {
+        Expect(book.AuthorLastName()).To(Equal("Hugo"))
+      })
+      It("returns empty for the first name", func() {
+        Expect(book.AuthorFirstName()).To(BeZero())
+      })
+    })
+```
+
+: Changes in how the application functions impact a lot on the test cases in TDD. 
+: BDD scenarios are not much impacted by the functionality changes.
+
+##
+.image images/dolls.jpg
+
+## Clarifications
+Ginkgo provides the DSL that allows developers to compose tests in a more expressive way.
+
+`Describe` blocks define the scenario you’re testing.
+
+`Context` blocks define the when of the test (i.e. “when invalid request is received,” “when service is unavailable”).
+
+`It` blocks run the code to test and state what you expect to happen (then).
+
+`BeforeEach` blocks run before each unit test (`Setup`).
+
+`AfterEach` blocks run after each unit test (`Teardown`).
+
+## So, what does all this do?
+
+.link https://onsi.github.io/ginkgo/#:~:text=Information%20is%20shared,in%20setup%20nodes%22. From the horse's mouth  (pt 1)
+
+"Information is shared between closures via closure variables. It is idiomatic for these closure variables to be declared within the container node closure and initialized in the setup node closure. Doing so ensures that each spec has a pristine, correctly initialized, copy of the shared variable.
+
+In this example, the single author name specs mutate the shared book closure variable. These mutations do not pollute the other specs because the BeforeEach closure reinitializes book.
+
+This detail is really important. Ginkgo requires, by default, that specs be fully independent. This allows Ginkgo to shuffle the order of specs and run specs in parallel. We'll cover this in more detail later on but for now embrace this takeaway: "Declare in container nodes, initialize in setup nodes".
+
+## Spec Subjects:
+'It'
+
+A thing to test:
+
+Does 'X' do this thing? Yes/no
+
+.image images/first.png 400 400
+
+## Spec testing steps:
+'Context'
+
+A thing to group by:
+
+Does 'X' have these attributes?
+
+.image images/second.png 400 400
+
+## Spec Groupings:i
+'Describe'
+
+The 'thing' being tested
+
+Sets up the 'When'
+
+.image images/third.png 400 400
+
+##
+.link https://onsi.github.io/ginkgo/#:~:text=There%27s%20a%20lot,organized%20in%20Ginkgo. From the horse's mouth (pt 2)
+
+"There's a lot going on here so let's break it down.
+
+Ginkgo makes extensive use of closures to allow us to build a descriptive spec hierarchy. This hierarchy is constructed using three kinds of nodes:
+
+We use container nodes like Describe and Context to organize the different aspects of code that we are testing hierarchically. In this case we are describing our book model's ability to categorize books across two different contexts - the behavior for large books "With more than 300 pages" and small books "With fewer than 300 pages".
+
+We use setup nodes like BeforeEach to set up the state of our specs. In this case, we are instantiating two new book models: lesMis and foxInSocks.
+
+(cont...)
+
+##
+Finally, we use subject nodes like It to write a spec that makes assertions about the subject under test. In this case, we are ensuring that book.Category() returns the correct category enum based on the length of the book. We make these assertions using Gomega's Equal matcher and Expect syntax. You can learn much more about Gomega here - the examples used throughout these docs should be self-explanatory.
+
+The container, setup, and subject nodes form a spec tree. Ginkgo uses the tree to construct a flattened list of specs where each spec can have multiple setup nodes but will only have one subject node.
+
+Because there are two subject nodes, Ginkgo will identify two specs to run. For each spec, Ginkgo will run the closures attached to any associated setup nodes and then run the closure attached to the subject node. In order to share state between the setup node and subject node we define closure variables like lesMis and foxInSocks. This is a common pattern and the main way that tests are organized in Ginkgo."
+
+## So then... 
+Question?
+
+.image images/tradeoffs.png
+
+Open for discussion
+
