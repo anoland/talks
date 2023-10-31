@@ -239,7 +239,7 @@ Ginkgo provides the DSL that allows developers to compose tests in a more expres
 
 In this example, the single author name specs mutate the shared book closure variable. These mutations do not pollute the other specs because the BeforeEach closure reinitializes book.
 
-This detail is really important. Ginkgo requires, by default, that specs be fully independent. This allows Ginkgo to shuffle the order of specs and run specs in parallel. We'll cover this in more detail later on but for now embrace this takeaway: "Declare in container nodes, initialize in setup nodes".
+This detail is really important. Ginkgo requires, by default, that specs be fully independent. This allows Ginkgo to shuffle the order of specs and run specs in parallel. We'll cover this in more detail later on but for now embrace this takeaway: `"Declare in container nodes, initialize in setup nodes"`.
 
 ## Spec Subjects:
 'It'
@@ -259,7 +259,7 @@ Does 'X' have these attributes?
 
 .image images/second.png 400 400
 
-## Spec Groupings:i
+## Spec Groupings:
 'Describe'
 
 The 'thing' being tested
